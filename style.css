@@ -1,0 +1,1554 @@
+@import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Goldman&display=swap');
+
+/* =============================================
+   VeyoGPT — Claude-Inspired Style
+   ============================================= */
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: 'Source Serif 4', 'Georgia', serif;
+  --sidebar-w: 260px;
+  --chat-max-w: 680px;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 24px;
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---------- Dark Theme ---------- */
+[data-theme="dark"] {
+  --bg-body: #1a1a1a;
+  --bg-sidebar: #171717;
+  --bg-chat: #1a1a1a;
+  --bg-msg-ai: #262626;
+  --bg-msg-user: transparent;
+  --bg-input: #262626;
+  --bg-hover: rgba(255, 255, 255, 0.06);
+  --bg-active: rgba(217, 119, 87, 0.12);
+  --text-1: #ececec;
+  --text-2: #a0a0a0;
+  --text-3: #6b6b6b;
+  --border: #2e2e2e;
+  --accent: #d9774f;
+  --accent-subtle: rgba(217, 119, 87, 0.15);
+  --accent-hover: #e08a64;
+  --shadow: rgba(0, 0, 0, 0.4);
+  --overlay: rgba(0, 0, 0, 0.6);
+  --scrollbar: #3a3a3a;
+  --code-bg: #1e1e1e;
+  --toast-bg: #262626;
+  --toast-border: #2e2e2e;
+  --toast-text: #ececec;
+  --preview-bg: #1a1a1a;
+}
+
+/* ---------- Light Theme ---------- */
+[data-theme="light"] {
+  --bg-body: #f3efe7;
+  --bg-sidebar: #e8e4dc;
+  --bg-chat: #f3efe7;
+  --bg-msg-ai: #e6e1d6;
+  --bg-msg-user: transparent;
+  --bg-input: #fbf9f5;
+  --bg-hover: rgba(0, 0, 0, 0.05);
+  --bg-active: rgba(217, 119, 87, 0.12);
+  --text-1: #2c2825;
+  --text-2: #5c5550;
+  --text-3: #8a827c;
+  --border: #d6d0c4;
+  --accent: #c4653a;
+  --accent-subtle: rgba(196, 101, 58, 0.1);
+  --accent-hover: #b55a32;
+  --shadow: rgba(0, 0, 0, 0.08);
+  --overlay: rgba(0, 0, 0, 0.3);
+  --scrollbar: #c0bab0;
+  --code-bg: #282c34;
+  --toast-bg: #fbf9f5;
+  --toast-border: #d6d0c4;
+  --toast-text: #2c2825;
+  --preview-bg: #fbf9f5;
+}
+
+/* ---------- Base ---------- */
+html,
+body {
+  height: 100%;
+  font-family: var(--font-sans);
+  background: var(--bg-body);
+  color: var(--text-1);
+  overflow: hidden;
+  overscroll-behavior: none; /* Prevent rubber-banding/whole page scroll */
+  transition: background var(--transition), color var(--transition);
+}
+
+/* Mobile: Fix body to prevent "sliding out" */
+@media (max-width: 700px) {
+  html, body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+  }
+}
+
+body {
+  display: flex;
+}
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar);
+  border-radius: 3px;
+}
+
+/* =============================================
+   Sidebar
+   ============================================= */
+.sidebar {
+  width: var(--sidebar-w);
+  height: 100%;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 14px 12px;
+  transition: background var(--transition), border-color var(--transition),
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+  z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+body.sidebar-collapsed .sidebar {
+  transform: translateX(-100%);
+}
+
+.sidebar-top {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.sidebar-header {
+  display: none; /* Hidden as per user request (rely on click-outside) */
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 4px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: -0.3px;
+  line-height: 1;
+}
+
+/* Reusable icon button */
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.icon-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-1);
+}
+
+/* New Chat */
+.new-chat-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-1);
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.new-chat-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+/* Search */
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.search-box:focus-within {
+  border-color: var(--accent);
+  background: var(--bg-input);
+}
+
+.search-icon {
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-sans);
+  font-size: 0.83rem;
+  color: var(--text-1);
+}
+
+.search-input::placeholder {
+  color: var(--text-3);
+}
+
+/* Chat History */
+.chat-history-section {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.chat-history-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 8px 8px 6px;
+}
+
+.chat-history {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.chat-history-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-2);
+  font-family: var(--font-sans);
+  font-size: 0.86rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.chat-history-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-1);
+}
+
+.chat-history-item.active {
+  background: var(--bg-active);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.chat-history-item .chat-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-delete-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.chat-history-item:hover .chat-delete-btn {
+  display: flex;
+}
+
+.chat-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  position: relative; /* Context for dropdown */
+}
+
+.model-picker {
+  position: relative;
+  width: 100%;
+}
+
+/* Apply Goldman font to model trigger text for a consistent look */
+.model-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  width: 100%;
+  background: var(--bg-hover);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-1);
+  font-family: 'Goldman', sans-serif;
+  font-size: 0.86rem;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.model-trigger:hover {
+  background: var(--bg-active);
+  border-color: var(--accent-subtle);
+}
+
+.model-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.current-model-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.chevron-icon {
+  color: var(--text-3);
+  transition: transform 0.2s ease;
+}
+
+.model-picker.open .chevron-icon {
+  transform: rotate(180deg);
+}
+
+/* Custom Dropdown */
+.model-dropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 280px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 -4px 12px var(--shadow);
+  padding: 6px;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 100;
+  margin-bottom: 8px;
+  animation: slideUp 0.15s ease;
+}
+
+.model-picker.open .model-dropdown {
+  display: flex;
+}
+
+.model-option {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  font-size: 0.84rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.15s ease;
+}
+
+.model-option:hover {
+  background: var(--bg-hover);
+  color: var(--text-1);
+}
+
+.model-option.active {
+  background: var(--bg-active);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.model-option.active::after {
+  content: "✓";
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.footer-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Theme toggle icons */
+[data-theme="dark"] .icon-sun {
+  display: block;
+}
+
+[data-theme="dark"] .icon-moon {
+  display: none;
+}
+
+[data-theme="light"] .icon-sun {
+  display: none;
+}
+
+[data-theme="light"] .icon-moon {
+  display: block;
+}
+
+/* =============================================
+   Sidebar Open Button
+   ============================================= */
+.sidebar-open-btn {
+  display: flex;
+  /* Removed fixed positioning as it's now in header */
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-body);
+  color: var(--text-2);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.sidebar-open-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-1);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  z-index: 95; /* Increased to be above everything except sidebar (100) and toast (1000) */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+  cursor: pointer; /* Show pointer to indicate clickable */
+}
+.overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.3s ease;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    transform: translateX(-100%);
+  }
+
+  body.sidebar-collapsed .sidebar {
+    margin-left: 0;
+    transform: translateX(-100%);
+  }
+
+  .sidebar.open {
+    transform: translateX(0) !important;
+    margin-left: 0 !important;
+  }
+
+  /* Show toggle on mobile always (covered by sidebar when open) */
+  .sidebar-toggle,
+  .sidebar-open-btn {
+    display: flex;
+  }
+}
+
+
+/* =============================================
+   Main Area
+   ============================================= */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  position: relative;
+}
+
+/* Chat Header */
+.chat-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  /* background: var(--bg-body); Optional: keep transparent or match bg */
+  width: 100%;
+}
+
+/* --- Veyo Logo Animation Styles --- */
+.veyo-logo-container {
+    cursor: pointer;
+    transition: transform 0.5s ease;
+    display: flex;
+    align-items: left;
+    /* Adjust size via scale or width/height on SVG directly. 
+       User requested font size 40px equivalent. 
+       The SVG viewBox is 500x150. 
+       To make it look like 40px height, we scale the container or SVG.
+    */
+    height: 45px; 
+    width: auto;
+}
+
+.veyo-logo-container svg {
+    height: 100%;
+    width: auto;
+}
+
+.veyo-text {
+    font-family: 'Goldman', cursive;
+    font-size: 100px; /* SVG internal font size */
+    font-weight: 700;
+    fill: rgb(217, 118, 79);
+    stroke: url(#livingGradient);
+    stroke-width: 2px;
+    filter: drop-shadow(0 0 5px rgb(76, 76, 76));
+    
+    /* --- THE MAGIC TRICK --- */
+    stroke-dasharray: 800 0;
+    
+    /* Animation runs infinitely */
+    animation: infiniteRun 2s linear infinite;
+
+
+    transition: stroke-dasharray 0.8s ease, stroke-width 0.3s ease, filter 0.3s ease, fill 0.3s ease;
+}
+
+/* HOVER STATE */
+.veyo-logo-container:hover .veyo-text {
+    stroke-dasharray: 400 400; 
+    stroke-width: 3px;
+    filter: drop-shadow(0 0 15px rgba(217, 119, 79, 0.8));
+    fill: rgba(217, 119, 79, 0.1);
+}
+
+/* Continuous Animation */
+@keyframes infiniteRun {
+    to {
+        stroke-dashoffset: -800;
+    }
+}
+
+/* Background Glow */
+.glow-circle {
+    position: absolute;
+    width: 300px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(130, 69, 44, 0) 0%, transparent 70%);
+    filter: blur (100px);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    pointer-events: none; /* Let clicks pass through */
+    left: 10px; /* Adjust based on logo position */
+    top: -50px;
+}
+
+.veyo-logo-container:hover + .glow-circle {
+    opacity: 1;
+}
+
+/* Mobile adjustment */
+@media (max-width: 800px) {
+  .chat-header {
+    padding: 12px 16px;
+  } 
+}
+
+.chat-scroll {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+}
+
+.chat-container {
+  width: 100%;
+  max-width: var(--chat-max-w);
+  padding: 16px 24px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Welcome ---------- */
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  text-align: center;
+  gap: 16px;
+  animation: fadeIn 0.5s ease;
+}
+
+.welcome-mark {
+  /* Replaced by SVG animation */
+  display: none;
+}
+
+/* SVG Container setup */
+.v-svg-container {
+  width: 100px;
+  height: 100px;
+  /* Subtle glow behind the whole letter */
+  filter: drop-shadow(0 0 15px rgba(217, 119, 79, 0.4));
+  margin-bottom: 4px;
+}
+
+/* The text style inside SVG */
+.v-text-path {
+  font-family: 'Goldman', cursive;
+  font-weight: 700;
+  font-size: 80px;
+   
+  fill: transparent; /* Andar se khokhla (empty) */
+  stroke: url(#veyoGradient); /* Border par gradient lagaya */
+  stroke-width: 3px; /* Border ki motai */
+  stroke-linecap: round;
+   
+  /* --- THE MAGIC SETUP --- */ 
+  /* Yahan hum border ko dash-gap-dash-gap mein todte hain. 
+     300 (dash length) aur 300 (gap length). 
+     Total 600 ka cycle hai. 
+  */ 
+  stroke-dasharray: 300 300; 
+   
+  /* Animation apply kar rahe hain */ 
+  animation: borderRace 4s linear infinite;
+}
+
+/* --- THE "ALIVE" ANIMATION --- */ 
+/* Hum dashoffset ko change karke border ko move kar rahe hain. 
+   Wahi purani wali irregular speed use ki hai taaki zinda lage. 
+*/ 
+@keyframes borderRace { 
+  0% { stroke-dashoffset: 600; } /* Start position */ 
+   
+  /* Fast Burst */ 
+  15% { stroke-dashoffset: 350; }  
+   
+  /* Slow Crawl */ 
+  45% { stroke-dashoffset: 250; } 
+   
+  /* Another quick move */ 
+  70% { stroke-dashoffset: 100; } 
+   
+  100% { stroke-dashoffset: 0; } /* End position (loops back to 600 implicitly) */ 
+}
+
+.welcome h1 {
+  font-family: 'Goldman', cursive;
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: var(--text-1);
+  letter-spacing: -0.5px;
+  animation: slideUpFade 0.8s ease-out;
+}
+
+@keyframes slideUpFade {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.welcome p {
+  color: var(--text-2);
+  font-size: 1rem;
+  max-width: 380px;
+  line-height: 1.6;
+  font-family: 'Goldman', cursive;
+}
+
+/* =============================================
+   Messages — Claude-style rows
+   ============================================= */
+/* =============================================
+   Message Actions (Edit / Copy)
+   ============================================= */
+.msg-actions {
+  position: absolute;
+  bottom: -28px;
+  right: 0;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.message-row:hover .msg-actions {
+  opacity: 1;
+  visibility: visible;
+  bottom: -32px;
+}
+
+.action-btn {
+  background: var(--bg-body);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  width: 28px;
+  height: 28px;
+}
+
+.action-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-1);
+  border-color: var(--accent-subtle);
+}
+
+.action-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Ensure message row has relative positioning for absolute actions */
+.message-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  position: relative;
+  width: 100%;
+}
+
+.message-row:last-child {
+  border-bottom: none;
+}
+
+.message-row.user {
+  justify-content: flex-end;
+  /* Add padding bottom to make room for actions */
+  padding-bottom: 12px;
+}
+
+/* Avatar */
+.msg-avatar {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-family: 'Goldman', sans-serif; /* Applied Goldman font */
+}
+
+.message-row.ai .msg-avatar {
+  background: linear-gradient(135deg, var(--accent), #e8a87c);
+  color: #fff;
+  /* font-family: var(--font-serif); Removed to use Goldman */
+}
+
+/* Content */
+.msg-content {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.94rem;
+  line-height: 1.6;
+  color: var(--text-1);
+  word-break: break-word;
+}
+
+/* User Bubble Styling */
+.message-row.user .msg-content {
+  flex: initial;
+  max-width: 80%;
+  background: var(--bg-hover);
+  padding: 10px 16px;
+  border-radius: 20px;
+  border-bottom-right-radius: 4px;
+  text-align: left;
+  color: var(--text-1);
+}
+
+/* Sender label */
+.msg-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-2);
+  margin-bottom: 4px;
+  text-transform: capitalize;
+  font-family: 'Goldman', sans-serif;
+}
+
+.msg-body {
+  white-space: pre-wrap;
+}
+
+/* Error */
+.message-row.error .msg-body {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.error-action-btn {
+  display: inline-block;
+  margin-top: 12px;
+  background: linear-gradient(135deg, #ef4444, #f59e0b, #ef4444);
+  background-size: 200% 200%;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.85em;
+  font-weight: 600;
+  box-shadow: 0 2px 5px rgba(239, 68, 68, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: btnGradientMove 3s ease infinite;
+}
+
+.error-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);
+}
+
+@keyframes btnGradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* =============================================
+   Typing cursor
+   ============================================= */
+.msg-body.typing::after {
+  content: "▋";
+  display: inline;
+  color: var(--accent);
+  animation: blink 0.8s step-end infinite;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+/* =============================================
+   Composer
+   ============================================= */
+.composer {
+  padding: 0 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Suggestions */
+.suggestion-container {
+  width: 100%;
+  max-width: var(--chat-max-w);
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px; /* Space for scrollbar if needed */
+  scrollbar-width: none; /* Hide scrollbar Firefox */
+  -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
+}
+
+.suggestion-container::-webkit-scrollbar {
+  display: none; /* Hide scrollbar Chrome/Safari */
+}
+
+.suggestion-chip {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-family: var(--font-sans);
+  user-select: none;
+}
+
+.suggestion-chip:hover {
+  background: var(--bg-active);
+  color: var(--text-1);
+  border-color: var(--accent-subtle);
+  /* transform: translateY(-1px); */
+}
+
+.composer-inner {
+  width: 100%;
+  max-width: var(--chat-max-w);
+  display: flex;
+  align-items: flex-end;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 6px 8px 6px 20px;
+  position: relative; /* Needed for pseudo-element positioning */
+  z-index: 1; /* Ensure content sits above border */
+  overflow: hidden; /* Clip the animated border */
+}
+
+/* Animated Gradient Border Effect on Focus */
+.composer-inner:focus-within {
+  border-color: transparent; /* Hide original border */
+}
+
+.composer-inner::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200%;
+  height: 600%;
+  /* "Stitch" / Gemini-style multi-color gradient */
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    #4285f4 10%, /* Google Blue */
+    #9b59b6 20%, /* Purple */
+    #e91e63 30%, /* Pink */
+    #ff9800 40%, /* Orange */
+    transparent 50%
+  );
+  transform: translate(-50%, -50%);
+  animation: rotateBorder 2s linear infinite; /* Smooth rotation */
+  z-index: -2;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  filter: blur(20px); /* Stronger blur for "Stitch" glow effect */
+}
+
+.composer-inner:focus-within::before {
+  opacity: 1; /* Show on focus */
+}
+
+/* Inner background to cover the rotating gradient center */
+.composer-inner::after {
+  content: "";
+  position: absolute;
+  inset: 2px; /* Border thickness */
+  background: var(--bg-input);
+  border-radius: calc(var(--radius-lg) - 2px);
+  z-index: -1;
+}
+
+@keyframes rotateBorder {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+#userInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-1);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  resize: none;
+  max-height: 160px;
+  padding: 10px 0;
+  position: relative;
+  z-index: 2;
+}
+
+#userInput::placeholder {
+  color: var(--text-3);
+}
+
+.send-btn {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border: none;
+  border-radius: 50%;
+  background: var(--text-1);
+  color: var(--bg-body);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  margin-bottom: 2px;
+  position: relative;
+  z-index: 2;
+}
+
+.send-btn:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
+}
+
+.send-btn:active {
+  transform: scale(0.95);
+}
+
+.send-btn.stop-btn {
+  background: #ef4444;
+  color: #fff;
+}
+
+.send-btn.stop-btn:hover {
+  background: #dc2626;
+}
+
+.composer-hint {
+  font-size: 0.72rem;
+  color: var(--text-3);
+  margin-top: 10px;
+  text-align: center;
+  font-family: 'Goldman', cursive;
+}
+
+/* =============================================
+   Markdown (inside msg-body)
+   ============================================= */
+.msg-body p {
+  margin-bottom: 0.8em;
+}
+
+.msg-body p:last-child {
+  margin-bottom: 0;
+}
+
+.msg-body h1,
+.msg-body h2,
+.msg-body h3,
+.msg-body h4 {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+  line-height: 1.3;
+  font-family: var(--font-serif);
+}
+
+.msg-body h1 {
+  font-size: 1.4em;
+}
+
+.msg-body h2 {
+  font-size: 1.2em;
+}
+
+.msg-body h3 {
+  font-size: 1.05em;
+}
+
+.msg-body ul,
+.msg-body ol {
+  margin-bottom: 0.8em;
+  padding-left: 1.5em;
+}
+
+.msg-body li {
+  margin-bottom: 0.3em;
+}
+
+.msg-body strong {
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.msg-body em {
+  font-style: italic;
+}
+
+.msg-body blockquote {
+  border-left: 3px solid var(--accent);
+  padding-left: 14px;
+  margin: 1em 0;
+  color: var(--text-2);
+  font-style: italic;
+}
+
+/* Inline code */
+.msg-body code {
+  background: rgba(0, 0, 0, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 0.88em;
+}
+
+[data-theme="light"] .msg-body code {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* Code blocks */
+.msg-body pre {
+  background: var(--code-bg);
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  margin: 1em 0;
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.msg-body pre code {
+  background: transparent;
+  padding: 0;
+  color: #d4d4d4;
+  font-size: 0.88em;
+}
+
+/* Links */
+.msg-body a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.msg-body a:hover {
+  text-decoration: underline;
+}
+
+/* Error text */
+.error-text {
+  color: #ef4444;
+  margin-top: 8px;
+  font-size: 0.88em;
+  padding: 8px 12px;
+  background: rgba(239, 68, 68, 0.08);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* =============================================
+   Animations
+   ============================================= */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =============================================
+   Toast Notification
+   ============================================= */
+.toast-notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: var(--toast-bg);
+  color: var(--toast-text);
+  padding: 16px 24px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px var(--shadow);
+  border: 1px solid var(--toast-border);
+  font-size: 1rem;
+  font-weight: 500;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Responsive additions */
+  width: auto;
+  max-width: 400px;
+  text-align: center;
+  line-height: 1.5;
+  cursor: default;
+  pointer-events: none; /* Initially non-interactive */
+}
+
+.toast-notification.show {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto; /* Interactive when shown */
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.toast-notification:hover {
+  transform: translate(-50%, -50%) scale(1.02);
+  box-shadow: 0 12px 32px var(--shadow);
+}
+
+/* Mobile Responsive */
+@media (max-width: 700px) {
+  .toast-notification {
+    width: 90%;
+    max-width: 90vw;
+    padding: 14px 20px;
+    font-size: 0.95rem;
+    border-radius: var(--radius-lg);
+    /* Keep centered but adapt width */
+  }
+}
+
+/* =============================================
+   Thinking Animation (Chat Interface)
+   ============================================= */
+.thinking-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.thinking-logo {
+  position: relative;
+  font-family: 'Syncopate', sans-serif;
+  font-size: 24px; /* Scaled down from 150px */
+  font-weight: 700;
+  color: var(--text-1); /* Use theme text color */
+  text-transform: uppercase;
+  -webkit-text-stroke: 1px var(--accent); /* Thinner stroke */
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thinking-logo::before {
+  content: "V";
+  position: absolute;
+  color: var(--accent);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Liquid Wave Effect */
+  clip-path: inset(100% 0 0 0);
+  animation: fillLiquidChat 2s ease-in-out infinite alternate;
+}
+
+@keyframes fillLiquidChat {
+  0% { clip-path: inset(80% 0 0 0); }
+  100% { clip-path: inset(10% 0 0 0); }
+}
+
+.thinking-text {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--text-3);
+  font-weight: 500;
+  opacity: 0.8;
+  animation: pulseText 2s ease-in-out infinite;
+}
+
+@keyframes pulseText {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* =============================================
+   Code Execution & Preview
+   ============================================= */
+.code-run-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.code-run-btn:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.code-run-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Preview Modal */
+.preview-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 90%;
+  max-width: 1000px;
+  height: 80vh;
+  transform: translate(-50%, -50%) scale(0.95);
+  background: var(--preview-bg);
+  border-radius: var(--radius-md);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.preview-modal.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-sidebar);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.preview-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-1);
+}
+
+.preview-content {
+  flex: 1;
+  background: #fff; /* Always white for iframe content usually */
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+
+#previewFrame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
+/* =============================================
+   Responsive
+   ============================================= */
+@media (max-width: 700px) {
+  .chat-container {
+    padding: 60px 16px 16px;
+  }
+
+  .composer {
+    padding: 0 12px 14px;
+  }
+
+  .composer-inner {
+    border-radius: 18px;
+    padding: 4px 6px 4px 16px;
+  }
+
+  .welcome h1 {
+    font-size: 1.4rem;
+  }
+
+  .message-row {
+    padding: 16px 0;
+    gap: 12px;
+  }
+}
+
+/* =============================================
+   Loading Screen
+   ============================================= */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-body);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+
+.loading-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* SVG Container setup for Loading */
+.loading-screen .v-svg-container {
+    width: 150px;
+    height: 150px;
+    /* Subtle glow behind the whole letter */
+    filter: drop-shadow(0 0 15px rgba(217, 119, 79, 0.4));
+}
+
+/* The text style inside SVG for Loading */
+.loading-screen .v-text-path {
+    font-family: 'Goldman', cursive;
+    font-weight: 700;
+    font-size: 80px;
+    
+    fill: transparent; /* Andar se khokhla (empty) */
+    stroke: url(#veyoGradientLoading); /* Border par gradient lagaya */
+    stroke-width: 3px; /* Border ki motai */
+    stroke-linecap: round;
+    
+    /* --- THE MAGIC SETUP --- */
+    stroke-dasharray: 300 300;
+    
+    /* Animation apply kar rahe hain */
+    animation: borderRace 2s linear 1 forwards;
+}
+
+@media (max-width: 700px) {
+  .loading-screen .v-svg-container {
+      width: 120px;
+      height: 120px;
+  }
+}
+
+/* =============================================
+   Custom Font Override (Goldman)
+   ============================================= */
+.logo-text,
+.logo-mark,
+.new-chat-btn,
+.search-input,
+.chat-history-label,
+.model-select {
+  font-family: 'Goldman', sans-serif !important;
+}
